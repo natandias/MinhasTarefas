@@ -37,7 +37,7 @@
       {{ successMessage }}
     </div>
 
-    <div class="column is-half" style="margin: 50%">
+    <div class="column is-half">
       <h1 class="has-text-centered mb-1 is-size-2">Minhas Tarefas</h1>
       <h3 class="has-text-centered mb-5">
         Não deixe para amanhã o que se pode fazer hoje!
@@ -77,7 +77,7 @@
 
         <div class="field mt-2">
           <label class="label">Senha</label>
-          <div class="control has-icons-left">
+          <div class="control has-icons-left has-icons-right">
             <input
               class="input"
               :type="showPassword ? 'text' : 'password'"
@@ -87,9 +87,8 @@
             <span class="icon is-small is-left">
               <i class="fas fa-lock"></i>
             </span>
-
             <span
-              class="icon is-small"
+              class="icon is-small is-right"
               :style="{
                 'cursor': 'pointer',
                 'pointer-events': 'all !important',
@@ -99,6 +98,19 @@
             >
               <i class="fas fa-eye"></i>
             </span>
+
+            <!-- <span
+              class="icon is-small"
+              :style="{
+                'cursor': 'pointer',
+                'pointer-events': 'all !important',
+                'color': showPassword ? 'black' : 'grey',
+              }"
+              style="height: 2.3em; margin-top: 0.1em; background: white"
+              @click="togglePassword"
+            >
+              <i class="fas fa-eye"></i>
+            </span> -->
           </div>
         </div>
 
@@ -127,9 +139,7 @@
     margin: auto;
   }
   .fade-enter-active,
-  /* Animações de entrada e saída podem utilizar diferentes  */
-/* funções de duração e de tempo.                          */
-.slide-fade-enter-active {
+  .slide-fade-enter-active {
     transition: all 0.3s ease;
   }
   .slide-fade-leave-active {

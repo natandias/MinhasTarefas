@@ -92,7 +92,7 @@
       <div class="modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">
-            {{ "Deseja mesmo excluir essa tarefa?" }}
+            {{ "Deletar tarefa?" }}
           </p>
           <button
             class="delete"
@@ -137,7 +137,13 @@
     <!-- Columns -->
     <div class="columns is-gapless tasks">
       <div class="column">
-        <div class="cardHeader has-text-centered" style="background: aliceblue">
+        <div
+          class="cardHeader has-text-centered"
+          :class="{
+            cardHeaderSticky: !isModalConfirmDeleteOpen && !isTaskModalOpen,
+          }"
+          style="background: aliceblue"
+        >
           <h1>Todas as tarefas</h1>
         </div>
         <div class="columnBody is-flex is-flex-direction-column">
@@ -159,7 +165,13 @@
         </div>
       </div>
       <div class="column">
-        <div class="cardHeader has-text-centered" style="background: #2497d9">
+        <div
+          class="cardHeader has-text-centered"
+          style="background: #2497d9"
+          :class="{
+            cardHeaderSticky: !isModalConfirmDeleteOpen && !isTaskModalOpen,
+          }"
+        >
           <h1>Em Andamento</h1>
         </div>
         <div class="columnBody is-flex is-flex-direction-column">
@@ -181,7 +193,13 @@
         </div>
       </div>
       <div class="column">
-        <div class="cardHeader has-text-centered" style="background: #00d1b2">
+        <div
+          class="cardHeader has-text-centered"
+          style="background: #00d1b2"
+          :class="{
+            cardHeaderSticky: !isModalConfirmDeleteOpen && !isTaskModalOpen,
+          }"
+        >
           <h1>Concluídas</h1>
         </div>
         <div
@@ -215,12 +233,26 @@
     justify-content: center;
     align-items: center;
   }
+
+  .cardHeaderSticky {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+  }
+
+  .cardHeader h1 {
+    font-weight: 500;
+    color: black;
+    font-size: 1.2rem;
+  }
+
   .columnBody {
     border-right: 1px solid grey;
     height: 100%;
     padding: 1em;
     gap: 2em;
   }
+
   .cards {
     gap: 2em;
   }

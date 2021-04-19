@@ -5,7 +5,6 @@
 <script>
   import { provide, ref, watch } from "vue";
   import { useRouter } from "vue-router";
-  import api from "./services/api";
 
   export default {
     setup() {
@@ -34,14 +33,16 @@
     margin: 0;
     padding: 0;
     border: 0;
-    height: 100%;
     width: 100%;
+    overflow: hidden;
   }
   .mainWrapper {
-    height: 100%;
     margin: 0;
     background-image: radial-gradient(#f6f6f6, #e9e9e9, #a5a5a5);
     /* background: #f7f7f7; */
+    /* overflow-y: scroll; */
+    height: 100%;
+    overflow-y: auto;
   }
   #app {
     font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -52,9 +53,10 @@
     margin: 0;
     padding: 0;
     border: 0;
-    height: 100%;
+    height: 100vh;
     width: 100%;
     box-sizing: border-box;
     overflow-x: hidden;
+    overflow-y: hidden;
   }
 </style>

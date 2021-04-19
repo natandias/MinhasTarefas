@@ -38,6 +38,7 @@
         href="#"
         @click="firstActionFunction(taskId)"
         class="card-footer-item"
+        style="background: #f54469; color: white"
         >{{ firstActionText }}</a
       >
       <a
