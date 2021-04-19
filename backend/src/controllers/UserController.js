@@ -85,11 +85,12 @@ module.exports = {
 
       const userUpdated = await knex("users")
         .where("id", user.id)
-        .first("token");
+        .first("id", "token");
 
       return res
         .json({
           success: true,
+          userId: userUpdated.id,
           token: userUpdated.token,
         })
         .status(200);

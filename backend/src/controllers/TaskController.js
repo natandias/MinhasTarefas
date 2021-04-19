@@ -12,6 +12,11 @@ module.exports = {
   },
 
   async CreateTask(req, res) {
+    const { title, description, deadlineDate, deadlineTime } = req.body;
+    const { user_id, token } = req.headers;
+
+    console.log("Req body", req.body);
+
     try {
       return res
         .json({
@@ -20,8 +25,10 @@ module.exports = {
         })
         .status(200);
     } catch (err) {
-      console.log("createTask err", err);
-      return res.json(err).status(400);
+      return res.status(400).json({
+        success: false,
+        error: err,
+      });
     }
   },
 
