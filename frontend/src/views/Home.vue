@@ -161,6 +161,8 @@
 </style>
 
 <script>
+  import api from "../services/api";
+
   import { ref, inject, onMounted } from "vue";
   import TaskCard from "../components/TaskCard.vue";
 
@@ -169,7 +171,6 @@
       TaskCard,
     },
     setup() {
-      const isLogged = inject("isLogged");
       const doLogout = inject("doLogout");
 
       const isTaskModalOpen = ref(false);
@@ -181,6 +182,21 @@
         deadlineDate: "",
         deadlineHour: "",
       });
+
+      const allTasks = ref([]);
+
+      const getAllTasks = async () => {
+        console.log("getAllTasks");
+        const allTasksFromReq = await api.makeHttpRequest(
+          "GET",
+          "tasks",
+          {},
+          true
+        );
+        allTasks.value = allTasksFromReq;
+
+        console.log("allTasksFromReq", allTasksFromReq);
+      };
 
       const createTask = () => {
         console.log("newTask", task.value);
@@ -231,7 +247,7 @@
       };
 
       onMounted(() => {
-        console.log("isLogged", isLogged.value);
+        getAllTasks();
       });
 
       return {

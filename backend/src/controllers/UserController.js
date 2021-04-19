@@ -62,6 +62,8 @@ module.exports = {
     const { username, password } = req.body;
 
     try {
+      if (!username || !password) throw "Usuário ou senha incorretos !";
+
       const user = await knex("users")
         .where("username", username)
         .first("id", "username", "password", "token");

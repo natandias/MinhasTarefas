@@ -2,6 +2,41 @@
   <div
     class="mainWrapper columns is-flex is-justify-content-center is-align-content-center is-align-items-center"
   >
+    <transition name="slide-fade">
+      <div
+        class="notification is-danger is-open"
+        style="
+          position: absolute;
+          width: fit-content;
+          height: fit-content;
+          top: 0;
+          right: 0;
+          margin-top: 1em;
+          margin-right: 1em;
+        "
+        v-show="isErrorOpen"
+      >
+        <button class="delete" @click="toggleIsError"></button>
+        {{ errorMessage }}
+      </div>
+    </transition>
+
+    <div
+      class="notification is-primary is-open"
+      style="
+        position: absolute;
+        width: fit-content;
+        height: fit-content;
+        top: 0;
+        right: 0;
+        margin-top: 1em;
+        margin-right: 1em;
+      "
+      v-show="isSuccessOpen"
+    >
+      {{ successMessage }}
+    </div>
+
     <div class="column is-half" style="margin: 50%">
       <h1 class="has-text-centered mb-1 is-size-2">Minhas Tarefas</h1>
       <h3 class="has-text-centered mb-5">
@@ -91,16 +126,37 @@
     max-width: 25em;
     margin: auto;
   }
+  .fade-enter-active,
+  /* Animações de entrada e saída podem utilizar diferentes  */
+/* funções de duração e de tempo.                          */
+.slide-fade-enter-active {
+    transition: all 0.3s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active em versões anteriores a 2.1.8 */ {
+    transform: translateX(10px);
+    opacity: 0;
+  }
 </style>
 
 <script>
+  import api from "../services/api";
+
   import { ref, inject } from "vue";
   import { useRouter } from "vue-router";
 
   export default {
     setup() {
       const router = useRouter();
-      const doLogin = inject("doLogin");
+
+      const isErrorOpen = ref(false);
+      const errorMessage = ref("");
+
+      const isSuccessOpen = ref(false);
+      const successMessage = ref("");
 
       const activeMenu = ref("Cadastrar");
       const username = ref("");
@@ -117,16 +173,98 @@
         showPassword.value = !showPassword.value;
       };
 
+      const toggleIsError = () => {
+        isErrorOpen.value = !isErrorOpen.value;
+      };
+
       const submit = event => {
-        if (activeMenu.value === "Cadastrar") {
-          event.preventDefault();
-          console.log("Cadastrar");
-        }
+        const doLogin = async (username, password) => {
+          const loginReqResult = await api.makeHttpRequest(
+            "POST",
+            "users/login",
+            {
+              username,
+              password,
+            },
+            false
+          );
+
+          console.log("loginReqResult", loginReqResult);
+
+          if (!loginReqResult.success) {
+            if (
+              loginReqResult.error &&
+              typeof loginReqResult.error === "string"
+            ) {
+              errorMessage.value = loginReqResult.error;
+            } else {
+              errorMessage.value = "Tente novamente mais tarde!";
+            }
+
+            isErrorOpen.value = true;
+            setTimeout(() => {
+              isErrorOpen.value = false;
+            }, 2000);
+            return false;
+          }
+
+          localStorage.setItem("user_id", loginReqResult.userId);
+          localStorage.setItem("token", loginReqResult.token);
+
+          if (loginReqResult.success) router.push("/home");
+        };
 
         if (activeMenu.value === "Entrar") {
           event.preventDefault();
-          console.log("Entrar");
-          doLogin();
+          doLogin(username.value, password.value);
+        }
+
+        if (activeMenu.value === "Cadastrar") {
+          event.preventDefault();
+          const signUp = async (username, password) => {
+            const signUpReqResult = await api.makeHttpRequest(
+              "POST",
+              "users",
+              {
+                username,
+                password,
+              },
+              false
+            );
+
+            console.log("signUpReqResult", signUpReqResult);
+
+            if (!signUpReqResult.success) {
+              if (
+                signUpReqResult.error &&
+                typeof signUpReqResult.error === "string"
+              ) {
+                errorMessage.value = signUpReqResult.error;
+              } else {
+                errorMessage.value = "Tente novamente mais tarde!";
+              }
+              isErrorOpen.value = true;
+
+              setTimeout(() => {
+                isErrorOpen.value = false;
+              }, 2000);
+              return false;
+            }
+
+            localStorage.setItem("user_id", signUpReqResult.userId);
+            localStorage.setItem("token", signUpReqResult.token);
+
+            if (signUpReqResult.success) {
+              isSuccessOpen.value = true;
+              successMessage.value =
+                "Cadastro concluído! Você será redirecionado para sua tela inicial";
+              setTimeout(() => {
+                doLogin(username, password);
+              }, 2000);
+            }
+          };
+
+          signUp(username.value, password.value);
         }
       };
 
@@ -138,6 +276,11 @@
         showPassword,
         togglePassword,
         submit,
+        isErrorOpen,
+        toggleIsError,
+        errorMessage,
+        isSuccessOpen,
+        successMessage,
       };
     },
   };

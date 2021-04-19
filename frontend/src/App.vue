@@ -5,31 +5,19 @@
 <script>
   import { provide, ref, watch } from "vue";
   import { useRouter } from "vue-router";
+  import api from "./services/api";
 
   export default {
     setup() {
       const router = useRouter();
 
-      const isLogged = ref(false);
-
-      const doLogin = () => {
-        isLogged.value = true;
-        router.push("/home");
-      };
-
       const doLogout = () => {
-        isLogged.value = false;
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("token");
+
         router.push("/");
       };
 
-      // watch(isLogged, (value, oldValue) => {
-      //   console.log("watch isLogged", value);
-      //   if (!value) router.push("/");
-      //   if (value) router.push("/home");
-      // });
-
-      provide("isLogged", isLogged);
-      provide("doLogin", doLogin);
       provide("doLogout", doLogout);
     },
   };
