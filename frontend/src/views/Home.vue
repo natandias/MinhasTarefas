@@ -86,22 +86,53 @@
       </div>
     </div>
 
+    <!-- Modal Confirm Delete -->
+    <div class="modal" :class="{ 'is-active': isModalConfirmDeleteOpen }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">
+            {{ "Deseja mesmo excluir essa tarefa?" }}
+          </p>
+          <button
+            class="delete"
+            aria-label="close"
+            @click="toggleModalConfirmDeleteTask"
+          ></button>
+        </header>
+        <section class="modal-card-body">
+          <p>Essa operação não pode ser revertida!</p>
+        </section>
+        <footer class="modal-card-foot is-flex is-justify-content-flex-end">
+          <button class="button" @click="toggleModalConfirmDeleteTask">
+            Cancelar
+          </button>
+          <button class="button is-danger" @click="deleteTask">
+            {{ "Deletar" }}
+          </button>
+        </footer>
+      </div>
+    </div>
+
     <!-- Columns -->
     <div class="columns is-gapless tasks">
       <div class="column">
         <div class="cardHeader has-text-centered" style="background: aliceblue">
           <h1>Todas as tarefas</h1>
         </div>
-        <div class="columnBody">
+        <div class="columnBody is-flex is-flex-direction-column">
           <TaskCard
-            taskId="1"
-            title="Colocar comida para o cachorro"
-            description="Lorem ipsum dolor sit amet consectetur"
-            deadline="11:09 PM - 1 Jan 2016"
+            v-for="task in allTasks.created"
+            :key="task.id"
+            :taskId="task.id"
+            :title="task.title"
+            :description="task.description"
+            :deadlineDate="task.deadlineDate"
+            :deadlineTime="task.deadlineTime"
             firstActionText="Excluir"
             secondActionText="Editar"
             thirdActionText="Executar"
-            :firstActionFunction="deleteTask"
+            :firstActionFunction="toggleModalConfirmDeleteTask"
             :secondActionFunction="toggleModalEditTask"
             :thirdActionFunction="allTasksExecute"
           />
@@ -120,7 +151,7 @@
             firstActionText="Excluir"
             secondActionText="Editar"
             thirdActionText="Concluir"
-            :firstActionFunction="deleteTask"
+            :firstActionFunction="toggleModalConfirmDeleteTask"
             :secondActionFunction="toggleModalEditTask"
             :thirdActionFunction="runningTasksConclude"
           />
@@ -137,7 +168,7 @@
             description="Lorem ipsum dolor sit amet consectetur"
             deadline="11:09 PM - 1 Jan 2016"
             firstActionText="Excluir"
-            :firstActionFunction="deleteTask"
+            :firstActionFunction="toggleModalConfirmDeleteTask"
           />
         </div>
       </div>
@@ -157,13 +188,17 @@
     border-right: 1px solid grey;
     height: 100%;
     padding: 1em;
+    gap: 2em;
+  }
+  .cards {
+    gap: 2em;
   }
 </style>
 
 <script>
   import api from "../services/api";
 
-  import { ref, inject, onMounted } from "vue";
+  import { ref, computed, inject, onMounted } from "vue";
   import TaskCard from "../components/TaskCard.vue";
 
   export default {
@@ -176,6 +211,8 @@
       const isTaskModalOpen = ref(false);
       const isUpdatingTask = ref(false);
 
+      const isModalConfirmDeleteOpen = ref(false);
+
       const task = ref({
         title: "",
         description: "",
@@ -183,7 +220,21 @@
         deadlineHour: "",
       });
 
-      const allTasks = ref([]);
+      const taskSelectId = ref(null);
+
+      const allTasks = ref({
+        created: [],
+        executing: [],
+        conluded: [],
+      });
+
+      const allTasksStored = computed(() => {
+        return [
+          ...allTasks.value.created,
+          ...allTasks.value.executing,
+          ...allTasks.value.conluded,
+        ];
+      });
 
       const getAllTasks = async () => {
         console.log("getAllTasks");
@@ -193,9 +244,13 @@
           {},
           true
         );
-        allTasks.value = allTasksFromReq;
-
-        console.log("allTasksFromReq", allTasksFromReq);
+        allTasks.value = {
+          created: allTasksFromReq.filter(item => item.status === "created"),
+          executing: allTasksFromReq.filter(
+            item => item.status === "executing"
+          ),
+          conluded: allTasksFromReq.filter(item => item.status === "concluded"),
+        };
       };
 
       const createTask = () => {
@@ -219,17 +274,43 @@
         isUpdatingTask.value = false;
       };
 
-      const deleteTask = taskId => {
-        console.log("deleteTask", taskId);
+      const deleteTask = async () => {
+        const deleteTask = await api.makeHttpRequest(
+          "DELETE",
+          `tasks/${taskSelectId.value}`,
+          {},
+          true
+        );
+
+        console.log("deleteTask", deleteTask);
+        getAllTasks();
+        isModalConfirmDeleteOpen.value = false;
+      };
+
+      const toggleModalConfirmDeleteTask = taskId => {
+        taskSelectId.value = taskId;
+        isModalConfirmDeleteOpen.value = !isModalConfirmDeleteOpen.value;
       };
 
       const toggleModalEditTask = taskId => {
+        const taskSelected = allTasksStored.value.filter(
+          task => task.id === taskId
+        );
+
+        const {
+          title,
+          description,
+          deadlineDate,
+          deadlineHour,
+        } = taskSelected[0];
+
         task.value = {
-          title: "taskId",
-          description: "taskId",
-          deadlineDate: "2021-04-29",
-          deadlineHour: "22:45",
+          title,
+          description,
+          deadlineDate,
+          deadlineHour,
         };
+
         isUpdatingTask.value = true;
         isTaskModalOpen.value = !isTaskModalOpen.value;
       };
@@ -254,9 +335,12 @@
         doLogout,
         toggleTaskModal,
         isTaskModalOpen,
+        allTasks,
         task,
         createTask,
+        toggleModalConfirmDeleteTask,
         deleteTask,
+        isModalConfirmDeleteOpen,
         updateTask,
         isUpdatingTask,
         toggleModalEditTask,

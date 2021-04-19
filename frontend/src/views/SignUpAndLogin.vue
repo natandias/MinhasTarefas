@@ -189,8 +189,6 @@
             false
           );
 
-          console.log("loginReqResult", loginReqResult);
-
           if (!loginReqResult.success) {
             if (
               loginReqResult.error &&
@@ -232,8 +230,6 @@
               false
             );
 
-            console.log("signUpReqResult", signUpReqResult);
-
             if (!signUpReqResult.success) {
               if (
                 signUpReqResult.error &&
@@ -250,9 +246,6 @@
               }, 2000);
               return false;
             }
-
-            localStorage.setItem("user_id", signUpReqResult.userId);
-            localStorage.setItem("token", signUpReqResult.token);
 
             if (signUpReqResult.success) {
               isSuccessOpen.value = true;

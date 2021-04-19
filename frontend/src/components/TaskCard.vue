@@ -20,7 +20,17 @@
       <div class="content">
         {{ description }}
         <br />
-        <p>{{ deadline }}</p>
+        <p>
+          {{
+            typeof deadlineDate === "string" && new Date(deadlineDate)
+              ? new Intl.DateTimeFormat("pt-BR").format(
+                  new Date(deadlineDate.split("-"))
+                )
+              : deadlineDate
+          }}
+          -
+          {{ deadlineTime }}
+        </p>
       </div>
     </div>
     <footer class="card-footer">
@@ -54,7 +64,8 @@
       taskId: String,
       title: String,
       description: String,
-      deadline: String,
+      deadlineDate: String,
+      deadlineTime: String,
       firstActionText: String,
       secondActionText: String,
       thirdActionText: String,
@@ -63,7 +74,7 @@
       thirdActionFunction: Function,
     },
 
-    setup() {
+    setup(props) {
       const isDescriptionVisible = ref(false);
 
       const toggleDescription = () => {

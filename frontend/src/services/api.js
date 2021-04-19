@@ -7,8 +7,8 @@ const commonApi = axios.create({
 const authenticatedApi = axios.create({
   baseURL: "http://localhost:5000/api/",
   headers: {
-    user_id: 1,
-    token: "$2b$10$eJsVv733sjl6rcRa1Pf1O.073Iz8ioehz7ACgDyBT7jiKZl3Lq4uu",
+    user_id: localStorage.getItem("user_id"),
+    token: localStorage.getItem("token"),
   },
 });
 
