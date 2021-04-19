@@ -69,7 +69,7 @@
             <div class="field">
               <label class="label">Horário limite da tarefa</label>
               <div class="control">
-                <input class="input" type="time" v-model="task.deadlineHour" />
+                <input class="input" type="time" v-model="task.deadlineTime" />
               </div>
             </div>
           </form>
@@ -113,6 +113,26 @@
         </footer>
       </div>
     </div>
+
+    <!-- Alert de erro -->
+    <transition name="slide-fade">
+      <div
+        class="notification is-danger is-open"
+        style="
+          position: absolute;
+          width: fit-content;
+          height: fit-content;
+          top: 0;
+          right: 0;
+          margin-top: 1em;
+          margin-right: 1em;
+        "
+        v-show="isErrorOpen"
+      >
+        <button class="delete" @click="toggleIsError"></button>
+        {{ errorMessage }}
+      </div>
+    </transition>
 
     <!-- Columns -->
     <div class="columns is-gapless tasks">
@@ -213,11 +233,15 @@
 
       const isModalConfirmDeleteOpen = ref(false);
 
+      const isErrorOpen = ref(false);
+      const errorMessage = ref("");
+
       const task = ref({
+        id: null,
         title: "",
         description: "",
         deadlineDate: "",
-        deadlineHour: "",
+        deadlineTime: "",
       });
 
       const taskSelectId = ref(null);
@@ -253,14 +277,31 @@
         };
       };
 
-      const createTask = () => {
-        console.log("newTask", task.value);
-        console.log("newTaskTitle", task.value.title);
-        console.log("newTaskDescription", task.value.description);
-        console.log("newTaskDeadline", task.value.deadline);
+      const createTask = async () => {
+        const { title, description, deadlineDate, deadlineTime } = task.value;
 
-        // REQUISIÇÃO HTTP AQUI
+        const createTaskResult = await api.makeHttpRequest(
+          "POST",
+          `tasks`,
+          {
+            title,
+            description,
+            deadlineDate,
+            deadlineTime,
+          },
+          true
+        );
 
+        if (
+          createTaskResult.error &&
+          typeof createTaskResult.error === "string"
+        ) {
+          errorMessage.value = createTaskResult.error;
+        } else {
+          errorMessage.value = "Tente novamente mais tarde!";
+        }
+
+        getAllTasks();
         toggleTaskModal();
       };
 
@@ -275,20 +316,28 @@
       };
 
       const deleteTask = async () => {
-        const deleteTask = await api.makeHttpRequest(
+        const deleteTaskResult = await api.makeHttpRequest(
           "DELETE",
           `tasks/${taskSelectId.value}`,
           {},
           true
         );
 
-        console.log("deleteTask", deleteTask);
+        if (
+          deleteTaskResult.error &&
+          typeof deleteTaskResult.error === "string"
+        ) {
+          errorMessage.value = deleteTaskResult.error;
+        } else {
+          errorMessage.value = "Tente novamente mais tarde!";
+        }
+
         getAllTasks();
-        isModalConfirmDeleteOpen.value = false;
+        toggleModalConfirmDeleteTask();
       };
 
       const toggleModalConfirmDeleteTask = taskId => {
-        taskSelectId.value = taskId;
+        if (taskId) taskSelectId.value = taskId;
         isModalConfirmDeleteOpen.value = !isModalConfirmDeleteOpen.value;
       };
 
@@ -298,25 +347,57 @@
         );
 
         const {
+          id,
           title,
           description,
           deadlineDate,
-          deadlineHour,
+          deadlineTime,
         } = taskSelected[0];
 
         task.value = {
+          id,
           title,
           description,
           deadlineDate,
-          deadlineHour,
+          deadlineTime,
         };
 
         isUpdatingTask.value = true;
         isTaskModalOpen.value = !isTaskModalOpen.value;
       };
 
-      const updateTask = () => {
-        console.log("updateTask", task.value);
+      const updateTask = async () => {
+        const {
+          id,
+          title,
+          description,
+          deadlineDate,
+          deadlineTime,
+        } = task.value;
+
+        const updateTaskResult = await api.makeHttpRequest(
+          "PUT",
+          `tasks/${id}`,
+          {
+            title,
+            description,
+            deadlineDate,
+            deadlineTime,
+          },
+          true
+        );
+
+        if (
+          updateTaskResult.error &&
+          typeof updateTaskResult.error === "string"
+        ) {
+          errorMessage.value = updateTaskResult.error;
+        } else {
+          errorMessage.value = "Tente novamente mais tarde!";
+        }
+
+        getAllTasks();
+        toggleTaskModal();
       };
 
       const allTasksExecute = taskId => {
@@ -325,6 +406,10 @@
 
       const runningTasksConclude = taskId => {
         console.log("runningTasksConclude", taskId);
+      };
+
+      const toggleIsError = () => {
+        isErrorOpen.value = !isErrorOpen.value;
       };
 
       onMounted(() => {
@@ -346,6 +431,9 @@
         toggleModalEditTask,
         allTasksExecute,
         runningTasksConclude,
+        isErrorOpen,
+        errorMessage,
+        toggleIsError,
       };
     },
   };
