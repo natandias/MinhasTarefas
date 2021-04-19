@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.string("description").notNullable();
     table.string("deadlineDate").notNullable();
     table.string("deadlineTime").notNullable();
+    table.string("status").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });

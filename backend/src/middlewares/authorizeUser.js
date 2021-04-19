@@ -10,6 +10,12 @@ module.exports = async function authorizeUser(req, res, next) {
       .first("id");
 
     if (user !== undefined && user) next();
+    else {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autorizado!",
+      });
+    }
   } catch (err) {
     return res.status(401).json({
       success: false,

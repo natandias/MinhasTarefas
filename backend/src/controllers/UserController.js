@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 module.exports = {
-  async GetUser(req, res) {
+  async GetUsers(req, res) {
     return res
       .json({
         controller: "User",
@@ -42,11 +42,12 @@ module.exports = {
       });
 
       const createdUser = await knex("users")
-        .first("token")
+        .first("id", "token")
         .where("username", username);
 
       return res.status(201).json({
         success: true,
+        userId: createdUser.id,
         token: createdUser.token,
       });
     } catch (err) {
