@@ -154,7 +154,7 @@
             thirdActionText="Executar"
             :firstActionFunction="toggleModalConfirmDeleteTask"
             :secondActionFunction="toggleModalEditTask"
-            :thirdActionFunction="allTasksExecute"
+            :thirdActionFunction="updateTaskStatus"
           />
         </div>
       </div>
@@ -162,18 +162,21 @@
         <div class="cardHeader has-text-centered" style="background: #2497d9">
           <h1>Em Andamento</h1>
         </div>
-        <div class="columnBody">
+        <div class="columnBody is-flex is-flex-direction-column">
           <TaskCard
-            taskId="2"
-            title="Colocar comida para o cachorro"
-            description="Lorem ipsum dolor sit amet consectetur"
-            deadline="11:09 PM - 1 Jan 2016"
+            v-for="task in allTasks.executing"
+            :key="task.id"
+            :taskId="task.id"
+            :title="task.title"
+            :description="task.description"
+            :deadlineDate="task.deadlineDate"
+            :deadlineTime="task.deadlineTime"
             firstActionText="Excluir"
             secondActionText="Editar"
             thirdActionText="Concluir"
             :firstActionFunction="toggleModalConfirmDeleteTask"
             :secondActionFunction="toggleModalEditTask"
-            :thirdActionFunction="runningTasksConclude"
+            :thirdActionFunction="updateTaskStatus"
           />
         </div>
       </div>
@@ -181,14 +184,22 @@
         <div class="cardHeader has-text-centered" style="background: #00d1b2">
           <h1>Concluídas</h1>
         </div>
-        <div class="columnBody" style="border-right: none">
+        <div
+          class="columnBody is-flex is-flex-direction-column"
+          style="border-right: none"
+        >
           <TaskCard
-            taskId="3"
-            title="Colocar comida para o cachorro"
-            description="Lorem ipsum dolor sit amet consectetur"
-            deadline="11:09 PM - 1 Jan 2016"
+            v-for="task in allTasks.conluded"
+            :key="task.id"
+            :taskId="task.id"
+            :title="task.title"
+            :description="task.description"
+            :deadlineDate="task.deadlineDate"
+            :deadlineTime="task.deadlineTime"
             firstActionText="Excluir"
+            secondActionText="Não concluiu?"
             :firstActionFunction="toggleModalConfirmDeleteTask"
+            :secondActionFunction="updateTaskStatus"
           />
         </div>
       </div>
@@ -261,7 +272,6 @@
       });
 
       const getAllTasks = async () => {
-        console.log("getAllTasks");
         const allTasksFromReq = await api.makeHttpRequest(
           "GET",
           "tasks",
@@ -275,6 +285,8 @@
           ),
           conluded: allTasksFromReq.filter(item => item.status === "concluded"),
         };
+
+        console.log("concluded tasks", allTasks.value.conluded);
       };
 
       const createTask = async () => {
@@ -400,12 +412,35 @@
         toggleTaskModal();
       };
 
-      const allTasksExecute = taskId => {
-        console.log("allTasksExecute", taskId);
-      };
+      const updateTaskStatus = async taskId => {
+        const taskSelected = allTasksStored.value.filter(
+          task => task.id === taskId
+        );
 
-      const runningTasksConclude = taskId => {
-        console.log("runningTasksConclude", taskId);
+        let status = "created";
+        if (taskSelected[0].status === "created") status = "executing";
+        if (taskSelected[0].status === "executing") status = "concluded";
+        if (taskSelected[0].status === "concluded") status = "executing";
+
+        const updateTaskResult = await api.makeHttpRequest(
+          "PATCH",
+          `tasks/${taskId}/status`,
+          {
+            status,
+          },
+          true
+        );
+
+        if (
+          updateTaskResult.error &&
+          typeof updateTaskResult.error === "string"
+        ) {
+          errorMessage.value = updateTaskResult.error;
+        } else {
+          errorMessage.value = "Tente novamente mais tarde!";
+        }
+
+        getAllTasks();
       };
 
       const toggleIsError = () => {
@@ -429,8 +464,7 @@
         updateTask,
         isUpdatingTask,
         toggleModalEditTask,
-        allTasksExecute,
-        runningTasksConclude,
+        updateTaskStatus,
         isErrorOpen,
         errorMessage,
         toggleIsError,

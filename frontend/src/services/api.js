@@ -1,15 +1,7 @@
 import axios from "axios";
 
-const commonApi = axios.create({
+const api = axios.create({
   baseURL: "http://localhost:5000/api/",
-});
-
-const authenticatedApi = axios.create({
-  baseURL: "http://localhost:5000/api/",
-  headers: {
-    user_id: localStorage.getItem("user_id"),
-    token: localStorage.getItem("token"),
-  },
 });
 
 export default {
@@ -19,13 +11,15 @@ export default {
     data = {},
     resourceNeedsAuthentication = false
   ) {
-    let api = resourceNeedsAuthentication ? authenticatedApi : commonApi;
-
     try {
       const apiResult = await api({
         method: method,
         url: resource,
         data: data,
+        headers: {
+          user_id: localStorage.getItem("user_id"),
+          token: localStorage.getItem("token"),
+        },
       });
 
       return apiResult && apiResult.data ? apiResult.data : null;

@@ -61,7 +61,7 @@
 
   export default {
     props: {
-      taskId: String,
+      taskId: Number,
       title: String,
       description: String,
       deadlineDate: String,
@@ -74,7 +74,7 @@
       thirdActionFunction: Function,
     },
 
-    setup(props) {
+    setup() {
       const isDescriptionVisible = ref(false);
 
       const toggleDescription = () => {
