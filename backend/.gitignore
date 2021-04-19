@@ -1,5 +1,1 @@
-!/**/.gitkeep
-.vscode
-
-obj/*
-bin/Debug/netcoreapp3.1/*
+node_modules

@@ -36,25 +36,15 @@
         class="card-footer-item"
         >{{ secondActionText }}</a
       >
+      <a
+        href="#"
+        @click="thirdActionFunction(taskId)"
+        class="card-footer-item"
+        >{{ thirdActionText }}</a
+      >
     </footer>
   </div>
 </template>
-
-<style scoped>
-  /* .cardHeader {
-    padding: 1em;
-    height: 5em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .columnBody {
-    border-left: 2px solid grey;
-    border-right: 2px solid grey;
-    height: 100%;
-    padding: 1em;
-  } */
-</style>
 
 <script>
   import { ref, inject, onMounted } from "vue";
@@ -67,8 +57,10 @@
       deadline: String,
       firstActionText: String,
       secondActionText: String,
+      thirdActionText: String,
       firstActionFunction: Function,
       secondActionFunction: Function,
+      thirdActionFunction: Function,
     },
 
     setup() {
