@@ -5,8 +5,12 @@ const hostname = "127.0.0.1";
 const port = 5000;
 
 const cors = require("cors");
+const corsConfig = {
+  origin: "*"
+}
 
-app.use(cors());
+app.use(cors(corsConfig));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const routes = require("./src/routes");

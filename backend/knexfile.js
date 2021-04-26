@@ -5,9 +5,9 @@ module.exports = {
   development: {
     client: "mysql",
     connection: {
-      database: "mytasks",
-      user: "mysql",
-      password: "1234",
+      database: "app",
+      user: "root",
+      password: "",
     },
     migrations: {
       tableName: "knex_migrations",

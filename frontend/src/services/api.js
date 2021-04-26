@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/",
+  baseURL: "http://app.test/api",
 });
 
 export default {
@@ -17,8 +17,9 @@ export default {
         url: resource,
         data: data,
         headers: {
-          user_id: localStorage.getItem("user_id"),
+          'Content-Type': 'application/json',
           token: localStorage.getItem("token"),
+          user_id: localStorage.getItem("user_id"),
         },
       });
 

@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
  */
 export default {
   plugins: [vue()],
+  base: "http://app.test/",
   server: {
     port: 3001
   }
