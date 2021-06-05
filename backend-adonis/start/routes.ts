@@ -20,16 +20,20 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route
-  .group(() => { 
-    Route.get('/', 'UsersController.GetAll');
+Route.group(() => {
+  Route.get('/', 'UsersController.GetAll')
+  Route.post('/', 'UsersController.Create')
+  Route.post('/login', 'UsersController.Login')
+  Route.put('/:id', 'UsersController.Update')
+  Route.delete('/:id', 'UsersController.Delete')
+}).prefix('/api/users')
 
-    Route.post('/', 'UsersController.Create');
-    
-    Route.post('/login', 'UsersController.Login');
-    
-    Route.put('/:id', 'UsersController.Update')
-    
-    Route.delete('/:id', 'UsersController.Delete')
-  })
-  .prefix('/api/users')
+Route.group(() => {
+  Route.get('/', 'TasksController.GetAll')
+  Route.post('/', 'TasksController.Create')
+  Route.put('/:id', 'TasksController.Update')
+  Route.patch('/:id/status', 'TasksController.UpdateStatus')
+  Route.delete('/:id', 'TasksController.Delete')
+})
+  .prefix('/api/tasks')
+  .middleware('Auth')
