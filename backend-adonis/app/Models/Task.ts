@@ -16,10 +16,10 @@ export default class Task extends BaseModel {
   @column()
   public description: string
 
-  @column()
+  @column({ serializeAs: 'deadlineDate' })
   public deadlineDate: string
 
-  @column()
+  @column({ serializeAs: 'deadlineTime' })
   public deadlineTime: string
 
   @column()
