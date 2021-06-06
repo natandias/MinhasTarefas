@@ -1,0 +1,51 @@
+/api/users:
+  post:
+    tags:
+      - Users
+    security: []
+    description: Create user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+                example: Jonhson
+              password: 
+                type: string
+                example: 123456
+    responses:
+      201:
+        description: Sucesso
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                userId:
+                  type: integer
+                token:
+                  type: string
+                  example: $2b$10$mDQc2.SRmsgaSbLqrcy4Nu5xfWhD1F2yJHxC9JGb2pGSjz12o.YvW
+      400:
+        description: Erro
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                error:
+                  type: string
+                  example: Falha na criação de usuário, tente novamente mais tarde ou consulte um administrador!
+

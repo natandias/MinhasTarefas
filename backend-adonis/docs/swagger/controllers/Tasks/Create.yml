@@ -1,0 +1,83 @@
+/api/tasks:
+  post:
+    tags:
+      - Tasks
+    security: []
+    description: Create task
+    parameters:
+      - in: header
+        name: user_id
+        schema:
+          type: string
+          example: 5
+        required: true
+      - in: header
+        name: token
+        schema:
+          type: string
+          example: $2b$10$mDQc2.SRmsgaSbLqrcy4Nu5xfWhD1F2yJHxC9JGb2pGSjz12o.YvW
+        required: true
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - description
+              - deadlineDate
+              - deadlineTime
+            properties:
+              title:
+                type: string
+                example: Comprar carne
+              description: 
+                type: string
+                example: Pesquisar preço no supermercado
+              deadlineDate: 
+                type: string
+                format: date
+                example: 2021-10-11
+              deadlineTime: 
+                type: string
+                example: 10:30
+    responses:
+      201:
+        description: Criado
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                userId:
+                  type: integer
+                token:
+                  type: string
+                  example: $2b$10$mDQc2.SRmsgaSbLqrcy4Nu5xfWhD1F2yJHxC9JGb2pGSjz12o.YvW
+      400:
+        description: Erro
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: false
+                error:
+                  type: string
+                  example: Houve um erro na criação da tarefa
+      401:
+        description: Não autorizado
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: Usuário não autorizado!
+
