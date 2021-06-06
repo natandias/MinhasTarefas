@@ -8,7 +8,7 @@ export default class Auth {
     try {
       const user = await User.query().select("id").where({ id: user_id, token: token }).first();
   
-      if (user !== undefined && user) next();
+      if (user !== undefined && user) await next();
       else {
         return response.unauthorized({
           error: "Usuário não autorizado!",
@@ -19,6 +19,5 @@ export default class Auth {
         error: "Usuário não autorizado!",
       });
     }
-    await next()
   }
 }

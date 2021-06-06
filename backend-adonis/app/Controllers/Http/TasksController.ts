@@ -37,7 +37,7 @@ export default class TasksController {
 
       if (!newTask.$isPersisted) throw { message: "Houve um erro na criação da tarefa" };
 
-      return response.ok({ success: true});
+      return response.created({ success: true});
     } catch (err) {
       let errorMessage = err.message;
 
