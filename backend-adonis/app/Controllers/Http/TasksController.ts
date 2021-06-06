@@ -15,6 +15,7 @@ export default class TasksController {
       return response.ok(tasks);
     } catch (err) {
       return response.badRequest({
+        success: false,
         error: err,
       });
     }
@@ -36,11 +37,12 @@ export default class TasksController {
 
       if (!newTask.$isPersisted) throw { message: "Houve um erro na criação da tarefa" };
 
-      return response.created();
+      return response.ok({ success: true});
     } catch (err) {
       let errorMessage = err.message;
 
       return response.badRequest({
+        success: false,
         error: errorMessage,
       });
     }
@@ -60,7 +62,7 @@ export default class TasksController {
       
       if (!updatedTask.$isPersisted) throw { message: "Houve um erro na atualização da tarefa" };
 
-      return response.noContent();
+      return response.ok({ success: true});
     } catch (err) {
       let errorMessage = err.message;
 
@@ -69,6 +71,7 @@ export default class TasksController {
       }
       
       return response.badRequest({
+        success: false,
         error: errorMessage,
       });
     }
@@ -87,7 +90,7 @@ export default class TasksController {
 
       if (!task.$isDeleted) throw { message: "Houve um erro ao deletar a tarefa" };
 
-      return response.noContent();
+      return response.ok({ success: true});
     } catch (err) {
       let errorMessage = err.message;
 
@@ -96,6 +99,7 @@ export default class TasksController {
       }
       
       return response.badRequest({
+        success: false,
         error: errorMessage,
       });
     }
@@ -115,7 +119,7 @@ export default class TasksController {
 
       if (!updatedTask.$isPersisted) throw { message: "Houve um erro na atualização do status da tarefa" };
 
-      return response.noContent();
+      return response.ok({ success: true});
     } catch (err) {
       let errorMessage = err.message;
 
@@ -124,6 +128,7 @@ export default class TasksController {
       }
       
       return response.badRequest({
+        success: false,
         error: errorMessage,
       });
     }

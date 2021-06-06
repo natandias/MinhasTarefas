@@ -38,11 +38,13 @@ export default class UsersController {
       })
 
       return response.created({
+        success: true,
         userId: createdUser.id,
         token: createdUser.token,
       })
     } catch (err) {
       return response.badRequest({
+        success: false,
         error:
           'Falha na criação de usuário, tente novamente mais tarde ou consulte um administrador!',
       })
@@ -76,12 +78,16 @@ export default class UsersController {
       const userUpdated = await User.findBy('username', username); 
 
       return response.ok({
+        success: true,
         userId: userUpdated?.id,
         token: userUpdated?.token,
       })
     } catch (err) {
+      let errorMessage = err.message;
+
       return response.badRequest({
-        error: err,
+        success: false,
+        error: errorMessage,
       });
     }
   }
