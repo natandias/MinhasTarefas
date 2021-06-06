@@ -25,21 +25,23 @@ export default class TasksController {
     const { user_id } = request.headers();
 
     try {
-      const wasTaskCreated = await Task.create({
-        userId: user_id,
-        title,
-        description,
-        deadlineDate,
-        deadlineTime,
-        status: "created",
-      })
+      const newTask = await Task.create({  
+          userId: user_id,
+          title,
+          description,
+          deadlineDate,
+          deadlineTime,
+          status: "created" 
+      });
 
-      if (!wasTaskCreated) throw "Houve um erro na criação da tarefa";
+      if (!newTask.$isPersisted) throw { message: "Houve um erro na criação da tarefa" };
 
       return response.created();
     } catch (err) {
+      let errorMessage = err.message;
+
       return response.badRequest({
-        error: err,
+        error: errorMessage,
       });
     }
   }
@@ -50,15 +52,24 @@ export default class TasksController {
     const { user_id } = request.headers();
 
     try {
-      const task = await Task.findOrFail(id);  
-      const updatedTask = await task.merge({ title, description, deadlineDate, deadlineTime }).save()
+      const task = await Task.findOrFail(id); 
+
+      if(task.userId !== parseInt(user_id)) throw { message: "Você não tem permissão para modificar essa tarefa" };
+
+      const updatedTask = await task.merge({ title, description, deadlineDate, deadlineTime }).save();
       
-      if (!updatedTask.$isPersisted) throw "Houve um erro na atualização da tarefa";
+      if (!updatedTask.$isPersisted) throw { message: "Houve um erro na atualização da tarefa" };
 
       return response.noContent();
     } catch (err) {
+      let errorMessage = err.message;
+
+      if(err.message && err.message.includes("E_ROW_NOT_FOUND")) {
+        errorMessage = "A tarefa não existe"
+      }
+      
       return response.badRequest({
-        error: err,
+        error: errorMessage,
       });
     }
   }
@@ -68,15 +79,24 @@ export default class TasksController {
     const { user_id } = request.headers();
   
     try {
-      const task = await Task.findOrFail(id);
-      await task.delete()
+      const task = await Task.findOrFail(id); 
 
-      if (!task.$isDeleted) throw "Houve um erro ao deletar a tarefa";
+      if(task.userId !== parseInt(user_id)) throw { message: "Você não tem permissão para excluir essa tarefa" };
+
+      await task.delete();
+
+      if (!task.$isDeleted) throw { message: "Houve um erro ao deletar a tarefa" };
 
       return response.noContent();
     } catch (err) {
+      let errorMessage = err.message;
+
+      if(err.message && err.message.includes("E_ROW_NOT_FOUND")) {
+        errorMessage = "A tarefa não existe"
+      }
+      
       return response.badRequest({
-        error: err,
+        error: errorMessage,
       });
     }
   }
@@ -88,14 +108,23 @@ export default class TasksController {
 
     try {
       const task = await Task.findOrFail(id);  
+
+      if(task.userId !== parseInt(user_id)) throw { message: "Você não tem permissão para excluir essa tarefa" };
+
       const updatedTask = await task.merge({ status }).save()
 
-      if (!updatedTask.$isPersisted) throw "Houve um erro na atualização do status da tarefa";
+      if (!updatedTask.$isPersisted) throw { message: "Houve um erro na atualização do status da tarefa" };
 
       return response.noContent();
     } catch (err) {
+      let errorMessage = err.message;
+
+      if(err.message && err.message.includes("E_ROW_NOT_FOUND")) {
+        errorMessage = "A tarefa não existe"
+      }
+      
       return response.badRequest({
-        error: err,
+        error: errorMessage,
       });
     }
   }
